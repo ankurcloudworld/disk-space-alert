@@ -4,7 +4,7 @@ This Python script monitors disk usage on a Linux system and sends an email aler
 
 ## Prerequisites
 
-- **Python 3**: The script will check if Python 3 is installed. If not, it attempts to install it using the system's package manager (`apt-get` or `yum`).
+  **Python 3**: The script will check if Python 3 is installed. If not, it attempts to install it using the system's package manager (`apt-get` or `yum`).
 
 ## Installation
 
