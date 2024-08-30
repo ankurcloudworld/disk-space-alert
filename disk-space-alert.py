@@ -46,36 +46,39 @@ SMTP_PASSWORD = "smtp_password"
 # Debugging Information
 print("Starting disk check...")
 print(f"Threshold: {THRESHOLD}%")
-print("Checking disk usage on partition mounted on /...")
 
 # HTML header for the email message
 alert_message = """<html><body>
 <h2>Disk Space Alert...</h2>
 <table border='1' cellpadding='5' cellspacing='0'>
-<tr><th>Partition</th><th>Total Space</th><th>Used Space</th><th>Available Space</th><th>Usage</th></tr>"""
+<tr><th>Partition</th><th>Total Space</th><th>Used Space</th><th>Available Space</th><th>Usage</th><th>Mounted On</th></tr>"""
 
-# Flag to track if partition exceeds the threshold
+# Flag to track if any partition exceeds the threshold
 alert_flag = False
 
-# Get disk usage for the partition mounted on /
-df_output = subprocess.check_output("df -h /", shell=True).decode()
+# Get disk usage for all partitions
+df_output = subprocess.check_output("df -h", shell=True).decode()
 lines = df_output.splitlines()
-line = lines[1].split()
-usage = int(line[4].strip('%'))
-total_space = line[1]
-used_space = line[2]
-available_space = line[3]
-partition = line[0]
 
-if usage >= THRESHOLD:
-    print(f"Partition {partition} is over threshold with {usage}% used")
-    alert_flag = True
-    alert_message += f"<tr><td>{partition}</td><td>{total_space}</td><td>{used_space}</td><td>{available_space}</td><td>{usage}%</td></tr>"
+# Loop through each line (starting from the second line) to check usage
+for line in lines[1:]:
+    parts = line.split()
+    filesystem = parts[0]
+    total_space = parts[1]
+    used_space = parts[2]
+    available_space = parts[3]
+    usage = int(parts[4].strip('%'))
+    mounted_on = parts[5]
+
+    if usage >= THRESHOLD:
+        print(f"Partition {filesystem} mounted on {mounted_on} is over threshold with {usage}% used")
+        alert_flag = True
+        alert_message += f"<tr><td>{filesystem}</td><td>{total_space}</td><td>{used_space}</td><td>{available_space}</td><td>{usage}%</td><td>{mounted_on}</td></tr>"
 
 # Close the HTML table
 alert_message += "</table></body></html>"
 
-# Send email if threshold is exceeded
+# Send email if any partition exceeds the threshold
 if alert_flag:
     print("Sending email alert...")
     msg = MIMEMultipart()
