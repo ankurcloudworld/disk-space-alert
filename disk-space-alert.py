@@ -10,13 +10,23 @@ import os
 def command_exists(command):
     return subprocess.call(f"type {command}", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE) == 0
 
+# Function to install Python 3 based on the package manager
+def install_python3():
+    print("Python 3 is not installed. Installing Python 3...")
+    if command_exists("apt-get"):
+        subprocess.run(["sudo", "apt-get", "update"], check=True)
+        subprocess.run(["sudo", "apt-get", "install", "-y", "python3"], check=True)
+    elif command_exists("yum"):
+        subprocess.run(["sudo", "yum", "update", "-y"], check=True)
+        subprocess.run(["sudo", "yum", "install", "-y", "python3"], check=True)
+    else:
+        print("Unsupported package manager. Please install Python 3 manually.")
+
 # Step 1: Check if Python is installed
 if not command_exists("python3"):
-    print("Python3 is not installed. Installing Python 3...")
-    subprocess.run(["sudo", "yum", "update", "-y"], check=True)
-    subprocess.run(["sudo", "yum", "install", "-y", "python3"], check=True)
+    install_python3()
 else:
-    print("Python3 is already installed. Proceeding to the next step...")
+    print("Python 3 is already installed. Proceeding to the next step...")
 
 # Step 2: Disk space alert script
 # Threshold for disk space usage percentage
