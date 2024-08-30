@@ -22,4 +22,4 @@ Follow these steps to set up and use the disk space alert script:
    
 3. **Run the script**:
 
-  python3 disk_space_alert.py
+     python3 disk_space_alert.py
